@@ -2,7 +2,7 @@
 
 > A Deno module for parsing multipart/form-data
 
-[![tag](https://img.shields.io/badge/Deno%20-std%400.114.0-333?&logo=Deno)](https://deno.land/std@0.114.0)
+[![tag](https://img.shields.io/badge/Deno%20-std%400.221.0-333?&logo=Deno)](https://deno.land/std@0.221.0)
 
 
 ### Features:
@@ -45,7 +45,7 @@ interface Form {
 Suppose your form has two fields, the first one has field name `singleStr` with text "this is string value" only, and the second field called `singleImg` with a img file named "singleImg.png". 
 
 ```ts
-import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.221.0/http/server.ts";
 import { multiParser } from 'https://deno.land/x/multiparser@<version>/mod.ts'
 
 serve(async (req) => {

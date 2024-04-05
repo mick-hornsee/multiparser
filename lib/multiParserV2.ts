@@ -91,7 +91,7 @@ function getForm(pieces: Uint8Array[]) {
 }
 
 function getHeaders(headerByte: Uint8Array) {
-  let contentTypeIndex = bytes.indexOf(headerByte, encode.contentType);
+  let contentTypeIndex = bytes.indexOfNeedle(headerByte, encode.contentType);
 
   // no contentType, it may be a string field, return name only
   if (contentTypeIndex < 0) {
@@ -123,7 +123,7 @@ function getHeaderNContentType(
 function getHeaderOnly(headerLineByte: Uint8Array) {
   let headers: Record<string, string> = {};
 
-  let filenameIndex = bytes.indexOf(headerLineByte, encode.filename);
+  let filenameIndex = bytes.indexOfNeedle(headerLineByte, encode.filename);
   if (filenameIndex < 0) {
     headers.name = getNameOnly(headerLineByte);
   } else {
@@ -146,7 +146,7 @@ function getNameNFilename(headerLineByte: Uint8Array, filenameIndex: number) {
 }
 
 function getNameOnly(headerLineByte: Uint8Array) {
-  let nameIndex = bytes.indexOf(headerLineByte, encode.name);
+  let nameIndex = bytes.indexOfNeedle(headerLineByte, encode.name);
   // jump <name="> and get string inside double quote => "string"
   let nameByte = headerLineByte.slice(
     nameIndex + encode.name.byteLength ,
@@ -156,7 +156,7 @@ function getNameOnly(headerLineByte: Uint8Array) {
 }
 
 function splitPiece(piece: Uint8Array) {
-  const contentIndex = bytes.indexOf(piece, encode.returnNewline2);
+  const contentIndex = bytes.indexOfNeedle(piece, encode.returnNewline2);
   const headerByte = piece.slice(0, contentIndex);
   const contentByte = piece.slice(contentIndex + 4);
 
@@ -164,15 +164,15 @@ function splitPiece(piece: Uint8Array) {
 }
 
 function getFieldPieces(buf: Uint8Array, boundaryByte: Uint8Array) {
-  const startBoundaryByte = bytes.concat(encode.dashdash, boundaryByte);
-  const endBoundaryByte = bytes.concat(startBoundaryByte, encode.dashdash);
+  const startBoundaryByte = bytes.concat([encode.dashdash, boundaryByte]);
+  const endBoundaryByte = bytes.concat([startBoundaryByte, encode.dashdash]);
 
   const pieces = [];
 
   while (!bytes.startsWith(buf, endBoundaryByte)) {
     // jump over boundary + '\r\n'
     buf = buf.slice(startBoundaryByte.byteLength + 2);
-    let boundaryIndex = bytes.indexOf(buf, startBoundaryByte);
+    let boundaryIndex = bytes.indexOfNeedle(buf, startBoundaryByte);
     // get field content piece
     pieces.push(buf.slice(0, boundaryIndex - 2)); // -2 means remove /r/n
     buf = buf.slice(boundaryIndex);
@@ -183,7 +183,7 @@ function getFieldPieces(buf: Uint8Array, boundaryByte: Uint8Array) {
 
 function getBoundary(contentType: string): Uint8Array | undefined {
   let contentTypeByte = encoder.encode(contentType);
-  let boundaryIndex = bytes.indexOf(contentTypeByte, encode.boundaryEqual);
+  let boundaryIndex = bytes.indexOfNeedle(contentTypeByte, encode.boundaryEqual);
   if (boundaryIndex >= 0) {
     // jump over 'boundary=' to get the real boundary
     let boundary = contentTypeByte.slice(
